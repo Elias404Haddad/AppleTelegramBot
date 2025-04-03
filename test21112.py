@@ -23,7 +23,7 @@ load_dotenv("data.env")
 # ================= CONFIGURATION =================
 TOKEN = os.getenv("BOT_TOKEN")
 EMAIL_REGEX = re.compile(r'^([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.com)$', re.ASCII)
-DB_PATH = Path("appleid_bot.db")
+DB_PATH = Path('DB_PATH', '/data/appleid_bot.db')
 
 # ================= IN-MEMORY STORAGE =================
 ADMINS = {"@Elias_H"}
