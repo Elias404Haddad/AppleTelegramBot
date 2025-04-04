@@ -23,7 +23,7 @@ load_dotenv("data.env")
 # ================= CONFIGURATION =================
 TOKEN = os.getenv("BOT_TOKEN")
 EMAIL_REGEX = re.compile(r'^([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.com)$', re.ASCII)
-DB_PATH = Path('DB_PATH', '/data/appleid_bot.db')
+DB_PATH = Path("appleid_bot.db")
 
 # ================= IN-MEMORY STORAGE =================
 ADMINS = {"@Elias_H"}
@@ -381,7 +381,7 @@ async def get_verification(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         
         phone_number = result[0]
     
-    await update.message.reply_text("🔍 Waiting for Apple SMS message...")
+    await update.message.reply_text("🔍 Searching for Apple verification messages...")
     
     # Implement the scraping logic with retries
     max_retries = 2
@@ -397,7 +397,10 @@ async def get_verification(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             else:
                 if retry_count < max_retries:
                     wait_time = random.uniform(5, 15)
-
+                    await update.message.reply_text(
+                        f"⏳ No messages found yet (attempt {retry_count + 1}/{max_retries + 1})\n"
+                        f"Waiting {wait_time:.1f} seconds before retry..."
+                    )
                     time.sleep(wait_time)
                 retry_count += 1
         except Exception as e:
@@ -410,7 +413,7 @@ async def get_verification(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             message += f"{idx}. {content}\n\n"
         await update.message.reply_text(message)
     else:
-        await update.message.reply_text("❌ No Apple verification messages arrived at this number, Check your Connection and resend code")
+        await update.message.reply_text("❌ No Apple verification messages found after all attempts.")
     
     await show_user_commands(update)
 
