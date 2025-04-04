@@ -1,0 +1,35 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application
+COPY . .
+
+# Create and configure persistent data directory
+RUN mkdir -p /data && \
+    chmod 777 /data
+
+# Environment variables
+ENV DB_PATH=/data/appleid_bot.db \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PORT=8000
+
+# Health check (ensure you implement this endpoint in your bot.py)
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD python -c "import requests; requests.get('http://localhost:${PORT}/health', timeout=2)" || exit 1
+
+CMD ["python", "bot.py"]
